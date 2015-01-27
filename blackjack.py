@@ -4,7 +4,7 @@
 # - Human player gets the first two cards
 # - Human player plays the rest of their hand
 # - Then computer gets next two cards
-# - Computer must take cards score  >= 17
+# - Computer must take cards score >= 17
 # - Computer must stand when score >= 17
 # - Aces always count as 11
 # - Human player loses if their score is > 21
@@ -41,80 +41,82 @@
 
 ## If user stands with less than 21, then it's the dealer's turn:
 
-##    Computer takes two cards
-##    Computer must take more cards while computer score < 17
-##    If computer score reached 21, computer wins.
-##    If computer score goes over 21, computer loses.
-##    If computer score is 17 to 20, winner is determined by higher score.
-
-
-
+## Computer takes two cards
+## Computer must take more cards while computer score < 17
+## If computer score reached 21, computer wins.
+## If computer score goes over 21, computer loses.
+## If computer score is 17 to 20, winner is determined by higher score.import random
 
 
 import random
-import time
 
-SUITS = "\u2663 \u2665 \u2666 \u2660".split()
-FACES = "A 2 3 4 5 6 7 8 9 10 J Q K".split()
+suits = ["\u2663", "\u2665", "\u2666", "\u2660"]
+faces =  ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
 deck = []
-for suit in SUITS:
-  for face in FACES:
-    deck.append(face+suit)
+
+for i in suits:
+	for j in faces:
+		deck.append(j+i)
 
 random.shuffle(deck)
 
-def calculate_score(cards):
-  value = 0
-  for card in cards:
-    face = card[:-1]
-    if face in ['J', 'Q', 'K']:
-      points = 10
-    elif face == 'A':
-      points = 11
-    else:
-      points = int(face)
-    value += points
-  return value
+def card_scores(cards):
+	scores = 0
+	for card in cards:
+		if card[0] in ["J", "Q", "K"]:
+			score = 10
+		elif card[0] == "A":
+			score = 11
+		else:
+			score = int(card[:-1])
+		scores = scores + score
+	return scores
 
-# Deal two cards
-hand = [deck.pop(0), deck.pop(0)]
-score = calculate_score(hand)
+#player got two cards
+your_hand = [deck.pop(0), deck.pop(1)]
+your_scores = card_scores(your_hand)
 
-print("Your hand:", " ".join(hand))
+print("You have:", "".join(your_hand))
+print("Your scores are", your_scores)
 
-while score < 21 and input("Do you want another card? (y/n) ") == 'y':
-  hand.append(deck.pop(0))
-  score = calculate_score(hand)
-  print("Your hand:", ", ".join(hand))
+#dealer got two cards
+dealer_hand = [deck.pop(0), deck.pop(1)]
+dealer_scores = card_scores(dealer_hand)
 
-if score > 21:
-  print("You're busted!")
-elif score == 21:
-  print("You win!")
+#play game
+while your_scores < 21 and input("Take another card? (y/n): ") == 'y':
+	your_hand.append(deck.pop(0))
+	your_scores = card_scores(your_hand)
+	print("You have:","".join(your_hand))
+	print("Your scores are", your_scores)
+	
+if your_scores == 21:
+	print("Blackjack! You won!")
+
+elif your_scores > 21:
+	print("You were busted. You lost!")
+
 else:
-  print("You have %s points." % score)
-  print()
-  dealer_hand = [deck.pop(0), deck.pop(0)]
-  dealer_score = calculate_score(dealer_hand)
-  print("Dealer has", " ".join(dealer_hand))
-  while dealer_score < 17:
-    print("The dealer will take another card...")
-    time.sleep(5)
-    dealer_hand.append(deck.pop(0))
-    dealer_score = calculate_score(dealer_hand)
-    print("Dealer now has", " ".join(dealer_hand))
-    time.sleep(3)
+	while dealer_scores < 17:
+		dealer_hand.append(deck.pop(0))
+		dealer_scores = card_scores(dealer_hand)
 
-  if dealer_score > 21:
-    print("The dealer busted! You win!")
-  elif dealer_score == 21:
-    print("The dealer got 21! You lose.")
-  elif dealer_score > score:
-    print("You lost.")
-  elif dealer_score == score:
-    print("It's a tie.... nobody wins this time.")
-  else:
-    print("You win!")
-
-
+	if dealer_scores == 21:
+		print("Dealer got Blackjack! You lost!")
+		print("Dealer has:", "".join(dealer_hand))
+		print("Dealer's scores are", dealer_scores)
+	elif dealer_scores > 21:
+		print("Dealer was busted. You won!")
+	elif your_scores > dealer_scores:
+		print("You won!")
+		print("Dealer has:", "".join(dealer_hand))
+		print("Dealer's scores are", dealer_scores)
+	elif your_scores < dealer_scores:
+		print("You lost!")
+		print("Dealer has:", "".join(dealer_hand))
+		print("Dealer's scores are", dealer_scores)
+	else:
+		print("It's a tie. No one won.")
+		print("Dealer has:", "".join(dealer_hand))
+		print("Dealer's scores are", dealer_scores)
